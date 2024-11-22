@@ -27,33 +27,35 @@ export default function MovieDetailScreen({ route }) {
   const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
+    const fetchMovieDetails = async () => {
+      try {
+        setIsLoading(true);
+        const [movieRes, creditsRes, similarRes] = await Promise.all([
+          fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${TMDB_API_KEY}`),
+          fetch(`https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=${TMDB_API_KEY}`),
+          fetch(`https://api.themoviedb.org/3/movie/${movieId}/similar?api_key=${TMDB_API_KEY}`)
+        ]);
+
+        const [movieData, creditsData, similarData] = await Promise.all([
+          movieRes.json(),
+          creditsRes.json(),
+          similarRes.json()
+        ]);
+
+        setMovie(movieData);
+        setCast(creditsData.cast || []);
+        setSimilarMovies(similarData.results || []);
+      } catch (error) {
+        console.error('Error fetching movie details:', error);
+        setCast([]);
+        setSimilarMovies([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     fetchMovieDetails();
   }, [movieId]);
-
-  const fetchMovieDetails = async () => {
-    try {
-      setIsLoading(true);
-      const [movieRes, creditsRes, similarRes] = await Promise.all([
-        fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${TMDB_API_KEY}`),
-        fetch(`https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=${TMDB_API_KEY}`),
-        fetch(`https://api.themoviedb.org/3/movie/${movieId}/similar?api_key=${TMDB_API_KEY}`)
-      ]);
-
-      const [movieData, creditsData, similarData] = await Promise.all([
-        movieRes.json(),
-        creditsRes.json(),
-        similarRes.json()
-      ]);
-
-      setMovie(movieData);
-      setCast(creditsData.cast);
-      setSimilarMovies(similarData.results);
-    } catch (error) {
-      console.error('Error fetching movie details:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   if (isLoading) {
     return (
@@ -246,61 +248,63 @@ export default function MovieDetailScreen({ route }) {
           </View>
 
           {/* Cast Section */}
-          <View className="mb-8">
-            <Text 
-              className="text-white font-bold tracking-wide mb-6"
-              style={{ fontSize: ios ? 24 : 22 }}
-            >
-              Top Cast
-            </Text>
-            <ScrollView 
-              horizontal 
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ 
-                paddingRight: 24,
-                gap: ios ? 24 : 20
-              }}
-            >
-              {cast.slice(0, 10).map(person => (
-                <TouchableOpacity 
-                  key={person.id} 
-                  className="items-center"
-                  style={{ width: ios ? 96 : 88 }}
-                >
-                  <View className="rounded-full overflow-hidden mb-3 border-2 border-neutral-700"
-                    style={{ 
-                      width: ios ? 96 : 88,
-                      height: ios ? 96 : 88
-                    }}
+          {cast.length > 0 && (
+            <View className="mb-8">
+              <Text 
+                className="text-white font-bold tracking-wide mb-6"
+                style={{ fontSize: ios ? 24 : 22 }}
+              >
+                Top Cast
+              </Text>
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ 
+                  paddingRight: 24,
+                  gap: ios ? 24 : 20
+                }}
+              >
+                {cast.slice(0, 10).map(person => (
+                  <TouchableOpacity 
+                    key={person.id} 
+                    className="items-center"
+                    style={{ width: ios ? 96 : 88 }}
                   >
-                    <Image
-                      source={{
-                        uri: person.profile_path
-                          ? `https://image.tmdb.org/t/p/w200${person.profile_path}`
-                          : fallbackPersonImage
+                    <View className="rounded-full overflow-hidden mb-3 border-2 border-neutral-700"
+                      style={{ 
+                        width: ios ? 96 : 88,
+                        height: ios ? 96 : 88
                       }}
-                      className="w-full h-full"
-                      style={{ resizeMode: 'cover' }}
-                    />
-                  </View>
-                  <Text 
-                    className="text-white text-center font-medium"
-                    style={{ fontSize: ios ? 15 : 14 }}
-                    numberOfLines={1}
-                  >
-                    {person.name}
-                  </Text>
-                  <Text 
-                    className="text-neutral-500 text-center mt-1"
-                    style={{ fontSize: ios ? 13 : 12 }}
-                    numberOfLines={1}
-                  >
-                    {person.character}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
+                    >
+                      <Image
+                        source={{
+                          uri: person.profile_path
+                            ? `https://image.tmdb.org/t/p/w200${person.profile_path}`
+                            : fallbackPersonImage
+                        }}
+                        className="w-full h-full"
+                        style={{ resizeMode: 'cover' }}
+                      />
+                    </View>
+                    <Text 
+                      className="text-white text-center font-medium"
+                      style={{ fontSize: ios ? 15 : 14 }}
+                      numberOfLines={1}
+                    >
+                      {person.name}
+                    </Text>
+                    <Text 
+                      className="text-neutral-500 text-center mt-1"
+                      style={{ fontSize: ios ? 13 : 12 }}
+                      numberOfLines={1}
+                    >
+                      {person.character}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          )}
 
           {/* Similar Movies */}
           {similarMovies.length > 0 && (
