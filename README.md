@@ -4,7 +4,7 @@ A modern, feature-rich movie and TV show discovery app built with React Native a
 ---
 <img src="./Screenshot_20241122-104042.jpg" alt="Screenshot" width="300" height="600">
 
-# Android APK Download Link
+### Android APK Download Link
 [CineVerse](https://expo.dev/artifacts/eas/3jcnpN2yxMAadJsE7xmkSg.apk)
 
 ## 🎬 Features
