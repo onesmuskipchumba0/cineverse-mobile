@@ -1,8 +1,15 @@
-import { View, Text, ScrollView, TouchableOpacity, FlatList } from 'react-native';
+import { View, FlatList, Dimensions } from 'react-native';
 import { useState, useEffect } from 'react';
 import { TMDB_API_KEY } from '../env';
 import MovieCard from '../components/MovieCard';
 import Loading from '../components/Loading';
+import Layout from '../components/Layout';
+import CategoryList from '../components/CategoryList';
+
+const { width } = Dimensions.get('window');
+const numColumns = 2;
+const gap = 16;
+const cardWidth = (width - (gap * (numColumns + 1))) / numColumns;
 
 export default function MoviesScreen() {
   const [activeCategory, setActiveCategory] = useState('Now Playing');
@@ -38,38 +45,33 @@ export default function MoviesScreen() {
   if (loading) return <Loading />;
 
   return (
-    <View className="flex-1 bg-neutral-900">
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} className="px-4 py-4">
-        {categories.map((category) => (
-          <TouchableOpacity
-            key={category.id}
-            onPress={() => setActiveCategory(category.title)}
-            className={`mr-4 px-4 py-2 rounded-full ${
-              activeCategory === category.title ? 'bg-neutral-700' : 'bg-neutral-800'
-            }`}
-          >
-            <Text className={`${
-              activeCategory === category.title ? 'text-white' : 'text-neutral-400'
-            } font-semibold`}>
-              {category.title}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-
-      <FlatList
-        data={movies}
-        numColumns={2}
-        className="px-4"
-        showsVerticalScrollIndicator={false}
-        columnWrapperStyle={{ justifyContent: 'space-between' }}
-        renderItem={({ item }) => (
-          <View className="w-[48%] mb-4">
+    <Layout>
+      <View className="flex-1">
+        <CategoryList 
+          categories={categories}
+          activeCategory={activeCategory}
+          setActiveCategory={setActiveCategory}
+        />
+        
+        <FlatList
+          data={movies}
+          numColumns={numColumns}
+          className="px-4 pt-4"
+          showsVerticalScrollIndicator={false}
+          columnWrapperStyle={{ 
+            justifyContent: 'space-between',
+            gap: gap 
+          }}
+          contentContainerStyle={{
+            gap: gap,
+            paddingBottom: 20
+          }}
+          renderItem={({ item }) => (
             <MovieCard movie={item} />
-          </View>
-        )}
-        keyExtractor={(item) => item.id.toString()}
-      />
-    </View>
+          )}
+          keyExtractor={(item) => item.id.toString()}
+        />
+      </View>
+    </Layout>
   );
-}
+} 

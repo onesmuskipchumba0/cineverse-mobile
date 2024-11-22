@@ -2,6 +2,7 @@ import { View, Text, ScrollView, FlatList } from 'react-native';
 import { useState, useEffect } from 'react';
 import MovieCard from '../components/MovieCard';
 import { TMDB_API_KEY } from '../env';
+import Layout from '../components/Layout';
 
 export default function HomeScreen() {
   const [trendingMovies, setTrendingMovies] = useState([]);
@@ -51,12 +52,14 @@ export default function HomeScreen() {
   );
 
   return (
-    <ScrollView className="bg-neutral-900">
-      <MovieRow title="Trending Now" data={trendingMovies} />
-      <MovieRow title="Popular" data={popularMovies} />
-      <MovieRow title="Top Rated" data={topRatedMovies} />
-      <MovieRow title="Upcoming" data={upcomingMovies} />
-      <MovieRow title="Now Playing" data={nowPlayingMovies} />
-    </ScrollView>
+    <Layout>
+      <ScrollView>
+        <MovieRow title="Trending Now" data={trendingMovies} />
+        <MovieRow title="Popular" data={popularMovies} />
+        <MovieRow title="Top Rated" data={topRatedMovies} />
+        <MovieRow title="Upcoming" data={upcomingMovies} />
+        <MovieRow title="Now Playing" data={nowPlayingMovies} />
+      </ScrollView>
+    </Layout>
   );
 } 
