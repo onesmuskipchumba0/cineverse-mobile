@@ -3,7 +3,7 @@
 A modern, feature-rich movie and TV show discovery app built with React Native and Expo. Browse popular movies, TV shows, search for your favorites, and explore detailed information about each title.
 ---
 <img src="./Screenshot_20241122-104042.jpg" alt="Screenshot" width="300" height="600">
----
+
 ## 🎬 Features
 
 - Browse popular movies and TV shows
